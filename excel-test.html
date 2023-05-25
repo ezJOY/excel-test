@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>엑셀 연습</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+</head>
+<body>
+엑셀 다운<button id="export-btn">다운버튼</button>
+
+<script>
+    const data = [
+        { column: 'column1', values: 'hello' },
+        { column: 'column2', values: 'world' },
+        { column: 'column3', values: 'hoho' }
+    ];
+    document.getElementById('export-btn').addEventListener('click',async ()=>{
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('시트 이름');
+
+        const columns = Object.keys(data[0]);
+        worksheet.columns = columns.map((column) => ({
+            header: column,
+            key: column
+        }));
+        worksheet.insertRows(2, data);
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        const url = window.URL.createObjectURL(blob); // blob으로 객체 URL 생성
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = '파일명.xlsx';
+        anchor.click(); // anchor를 다운로드 링크로 만들고 강제로 클릭 이벤트 발생
+        window.URL.revokeObjectURL(url); // 메모리에서 해제
+    })
+</script>
+</body>
+</html>
